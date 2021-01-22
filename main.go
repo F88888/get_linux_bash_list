@@ -6,29 +6,34 @@ import (
 )
 
 type BashList struct {
+	Err  error
 	List []string
 }
 
-func GetBash() (bashList BashList, err error) {
+func GetBash() (bashList BashList) {
 	// init
 	var bashText []byte
 	var bashRegexp = regexp.MustCompile(" (\\w{,20}) \\[[\\-0-9a-zA-Z]")
-	if bashText, err = exec.Command("help -d").Output(); err == nil {
+	if bashText, bashList.Err = exec.Command("help -d").Output(); bashList.Err == nil {
 		// Regular Expression Matching
 		bashList.List = bashRegexp.FindAllString(string(bashText), -1)
 	}
-	return bashList, err
+	return bashList
 }
 
-func (e BashList) GetList() []string {
-	return e.List
+func (e BashList) GetList() ([]string, error) {
+	return e.List, e.Err
 }
 
-func (e BashList) InBash(text string) bool {
-	for _, v := range e.List {
-		if text == v {
-			return true
+func (e BashList) InBash(text string) (bool, error) {
+	isTrue := false
+	if e.Err == nil {
+		for _, v := range e.List {
+			if text == v {
+				isTrue = true
+				break
+			}
 		}
 	}
-	return false
+	return isTrue, e.Err
 }
