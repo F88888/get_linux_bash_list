@@ -2,7 +2,7 @@
 
 > Get the bash built-in command list of the current system, mainly used with go exec module
 
-## 2. 使用说明
+## 2. instructions
 
 ```
 var bashList []string
