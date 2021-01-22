@@ -13,10 +13,15 @@ type BashList struct {
 func GetBash() (bashList BashList) {
 	// init
 	var bashText []byte
-	var bashRegexp = regexp.MustCompile(" (\\w{,20}) \\[[\\-0-9a-zA-Z]")
-	if bashText, bashList.Err = exec.Command("help -d").Output(); bashList.Err == nil {
+	var bashRegexp = regexp.MustCompile("\\s(\\w{1,20})\\s\\[[\\-0-9a-zA-Z]")
+	if bashText, bashList.Err = exec.Command("bash", "-c", "help -d").Output(); bashList.Err == nil {
 		// Regular Expression Matching
-		bashList.List = bashRegexp.FindAllString(string(bashText), -1)
+		ss := bashRegexp.FindAllStringSubmatch(string(bashText), -1)
+		for _, v := range ss {
+			if len(v) == 2 {
+				bashList.List = append(bashList.List, v[1])
+			}
+		}
 	}
 	return bashList
 }
